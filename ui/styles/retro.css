@@ -1,0 +1,310 @@
+/* ============================================================
+   retro.css — 1990s retro-futurist digital-dashboard theme.
+   Inspired by the Nissan 300ZX Turbo digital cluster: amber/cyan
+   phosphor glow, segmented readouts, scanlines, hard bevels.
+   Only applies when <html data-style="retro">.
+   ============================================================ */
+
+html[data-style="retro"][data-mode="dark"] {
+  --bg: #04080a;
+  --bg-elev: #0a1418;
+  --bg-sunk: #02060700;
+  --bg-sunk: #020809;
+  --fg: #d8fff4;
+  --fg-dim: #4fb6a3;
+  --accent: #00f0c0;
+  --accent-2: #ff9e2c;
+  --border: #0e3b38;
+  --radius: 4px;
+  --font-ui: "Eurostile", "Bahnschrift", "Segoe UI", sans-serif;
+  --font-mono: "Cascadia Mono", "Consolas", monospace;
+}
+
+html[data-style="retro"][data-mode="light"] {
+  --bg: #cfe3dc;
+  --bg-elev: #e4f1ec;
+  --bg-sunk: #f1f8f5;
+  --fg: #062b26;
+  --fg-dim: #2f6f63;
+  --accent: #007a63;
+  --accent-2: #b8540a;
+  --border: #9bc3b8;
+  --radius: 4px;
+  --font-ui: "Eurostile", "Bahnschrift", "Segoe UI", sans-serif;
+}
+
+/* Scanline + grid backdrop */
+html[data-style="retro"] body {
+  background-image:
+    repeating-linear-gradient(
+      0deg,
+      color-mix(in srgb, var(--accent) 4%, transparent) 0px,
+      color-mix(in srgb, var(--accent) 4%, transparent) 1px,
+      transparent 1px,
+      transparent 3px
+    );
+}
+
+html[data-style="retro"] #topbar {
+  border-bottom: 2px solid var(--accent);
+  box-shadow: 0 4px 18px -8px var(--accent);
+}
+html[data-style="retro"] .brand-name {
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  text-shadow: 0 0 10px color-mix(in srgb, var(--accent) 60%, transparent);
+}
+html[data-style="retro"] .brand-mark {
+  text-shadow: 0 0 12px var(--accent);
+}
+
+html[data-style="retro"] .tab-btn {
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-size: 0.82em;
+}
+html[data-style="retro"] .tab-btn.active {
+  text-shadow: 0 0 8px var(--accent);
+}
+
+/* Bevelled, glowing panels */
+html[data-style="retro"] .stream-card,
+html[data-style="retro"] .subbox,
+html[data-style="retro"] .inv-card,
+html[data-style="retro"] .settings-group,
+html[data-style="retro"] .stream-row {
+  box-shadow:
+    inset 0 0 0 1px color-mix(in srgb, var(--accent) 12%, transparent),
+    0 0 22px -14px var(--accent);
+  background-image: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--accent) 5%, transparent),
+    transparent 40%
+  );
+}
+
+html[data-style="retro"] .status-chip {
+  text-transform: uppercase;
+  font-family: var(--font-mono);
+}
+html[data-style="retro"] .status-chip[data-state="farming"] {
+  border-color: var(--accent);
+  text-shadow: 0 0 6px var(--accent);
+}
+
+/* Segmented progress readouts */
+html[data-style="retro"] .sr-pct,
+html[data-style="retro"] .ic-meta,
+html[data-style="retro"] .sc-meta {
+  font-family: var(--font-mono);
+  letter-spacing: 0.05em;
+}
+
+html[data-style="retro"] .sr-bar > span,
+html[data-style="retro"] .inv-bar > span {
+  background: linear-gradient(90deg, var(--accent), var(--accent-2));
+  box-shadow: 0 0 10px var(--accent);
+}
+
+/* Rank badges glow */
+html[data-style="retro"] .game-item .gi-rank {
+  box-shadow: 0 0 10px var(--accent);
+}
+
+/* Section headers like instrument labels */
+html[data-style="retro"] .section-head h2,
+html[data-style="retro"] .subbox-head h2 {
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-size: clamp(12px, 1.3vw, 16px);
+}
+
+html[data-style="retro"] .btn-primary {
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  box-shadow: 0 0 16px -4px var(--accent);
+}
+
+html[data-style="retro"] .engine-log {
+  text-shadow: 0 0 6px color-mix(in srgb, var(--accent) 30%, transparent);
+}
+
+/* ============================================================
+   300ZX digital-cluster polish
+   ============================================================ */
+
+/* ---- CRT overlay: fine scanlines + vignette + faint flicker ---- */
+html[data-style="retro"] #crt-overlay {
+  display: block;
+  position: fixed;
+  inset: 0;
+  z-index: 55;
+  pointer-events: none;
+  background-image:
+    repeating-linear-gradient(
+      0deg,
+      rgba(0, 0, 0, 0.16) 0px,
+      rgba(0, 0, 0, 0.16) 1px,
+      transparent 1px,
+      transparent 2px
+    ),
+    radial-gradient(
+      120% 100% at 50% 50%,
+      transparent 58%,
+      color-mix(in srgb, var(--bg) 70%, #000) 100%
+    );
+  mix-blend-mode: multiply;
+  animation: crtFlicker 5.5s steps(60) infinite;
+}
+html[data-style="retro"][data-mode="light"] #crt-overlay { mix-blend-mode: normal; opacity: 0.5; }
+@keyframes crtFlicker {
+  0%, 96%, 100% { opacity: 1; }
+  97% { opacity: 0.92; }
+  98% { opacity: 1; }
+  99% { opacity: 0.95; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html[data-style="retro"] #crt-overlay { animation: none; }
+}
+
+/* ---- Grid + scanline backdrop on the page itself ---- */
+html[data-style="retro"] body {
+  background-color: var(--bg);
+  background-image:
+    linear-gradient(color-mix(in srgb, var(--accent) 6%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in srgb, var(--accent) 6%, transparent) 1px, transparent 1px);
+  background-size: 38px 38px, 38px 38px;
+}
+
+/* ---- Top bar as an instrument binnacle ---- */
+html[data-style="retro"] #topbar {
+  border-bottom: 2px solid var(--accent);
+  box-shadow: 0 6px 22px -10px var(--accent), inset 0 -1px 0 var(--accent-2);
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--accent) 8%, transparent), transparent 70%);
+}
+html[data-style="retro"] .brand-mark {
+  color: var(--accent-2);
+  text-shadow: 0 0 14px var(--accent-2);
+}
+
+/* ---- Status chip as an indicator lamp ---- */
+html[data-style="retro"] .status-chip {
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  background: color-mix(in srgb, var(--bg) 80%, #000);
+  box-shadow: inset 0 0 10px -4px var(--accent);
+}
+html[data-style="retro"] .status-chip .status-dot {
+  box-shadow: 0 0 8px 1px currentColor;
+}
+html[data-style="retro"] .status-chip[data-state="farming"] .status-dot {
+  animation: lampPulse 1.4s ease-in-out infinite;
+}
+@keyframes lampPulse {
+  0%, 100% { opacity: 1; box-shadow: 0 0 10px 2px currentColor; }
+  50% { opacity: 0.55; box-shadow: 0 0 4px 0 currentColor; }
+}
+
+/* ---- Panels: hard edges + corner brackets ---- */
+html[data-style="retro"] .stream-card,
+html[data-style="retro"] .inv-card,
+html[data-style="retro"] .subbox {
+  position: relative;
+  border-radius: 2px;
+}
+html[data-style="retro"] .stream-card::before,
+html[data-style="retro"] .stream-card::after,
+html[data-style="retro"] .inv-card::before,
+html[data-style="retro"] .inv-card::after {
+  content: "";
+  position: absolute;
+  width: 11px;
+  height: 11px;
+  pointer-events: none;
+  opacity: 0.85;
+}
+html[data-style="retro"] .stream-card::before,
+html[data-style="retro"] .inv-card::before {
+  top: 4px; left: 4px;
+  border-top: 2px solid var(--accent);
+  border-left: 2px solid var(--accent);
+}
+html[data-style="retro"] .stream-card::after,
+html[data-style="retro"] .inv-card::after {
+  bottom: 4px; right: 4px;
+  border-bottom: 2px solid var(--accent-2);
+  border-right: 2px solid var(--accent-2);
+}
+
+/* ---- Stream card head: channel as a label plate ---- */
+html[data-style="retro"] .sc-channel {
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--accent);
+  text-shadow: 0 0 8px color-mix(in srgb, var(--accent) 55%, transparent);
+}
+html[data-style="retro"] .sc-channel {
+  color: var(--fg);
+  text-shadow: none;
+}
+html[data-style="retro"] .sc-sep { color: var(--accent); opacity: 0.4; }
+html[data-style="retro"] .sc-op {
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.72em;
+  color: var(--accent-2);
+  border: 1px solid color-mix(in srgb, var(--accent-2) 40%, transparent);
+  border-radius: 2px;
+  padding: 0 6px;
+  text-shadow: 0 0 7px color-mix(in srgb, var(--accent-2) 50%, transparent);
+}
+
+/* ---- LCD digital readouts for percentages ---- */
+html[data-style="retro"] .sc-pct,
+html[data-style="retro"] .sr-pct,
+html[data-style="retro"] .ic-meta > span:last-child {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  color: var(--accent);
+  background: color-mix(in srgb, var(--bg) 70%, #000);
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  padding: 1px 7px;
+  text-shadow: 0 0 9px var(--accent);
+  box-shadow: inset 0 0 9px -3px var(--accent);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---- Segmented bar-graph meters (like the 300ZX bar tach) ---- */
+html[data-style="retro"] .sr-bar,
+html[data-style="retro"] .inv-bar {
+  background:
+    repeating-linear-gradient(
+      90deg,
+      color-mix(in srgb, var(--fg-dim) 22%, transparent) 0 7px,
+      transparent 7px 9px
+    );
+  background-color: color-mix(in srgb, var(--bg) 60%, #000);
+  box-shadow: inset 0 0 6px -2px #000;
+  border: 1px solid var(--border);
+  overflow: hidden;
+}
+html[data-style="retro"] .sr-bar > span,
+html[data-style="retro"] .inv-bar > span {
+  background: linear-gradient(90deg, var(--accent-2), var(--accent));
+  box-shadow: 0 0 12px var(--accent);
+  -webkit-mask-image: repeating-linear-gradient(90deg, #000 0 7px, transparent 7px 9px);
+  mask-image: repeating-linear-gradient(90deg, #000 0 7px, transparent 7px 9px);
+}
+
+/* ---- Section headers as etched instrument labels ---- */
+html[data-style="retro"] .section-head h2,
+html[data-style="retro"] .subbox-head h2 {
+  color: var(--accent);
+  text-shadow: 0 0 7px color-mix(in srgb, var(--accent) 45%, transparent);
+}
+html[data-style="retro"] .section-head {
+  border-bottom: 1px solid color-mix(in srgb, var(--accent) 22%, transparent);
+}

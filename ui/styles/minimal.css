@@ -1,0 +1,82 @@
+/* ============================================================
+   minimal.css — deliberately boring, flat, corporate-PR theme.
+   No curves, no glow, no personality. Just function.
+   Only applies when <html data-style="minimal">.
+   ============================================================ */
+
+html[data-style="minimal"][data-mode="dark"] {
+  --bg: #1e1e1e;
+  --bg-elev: #262626;
+  --bg-sunk: #2e2e2e;
+  --fg: #e8e8e8;
+  --fg-dim: #9a9a9a;
+  --accent: #3b82f6;
+  --accent-2: #d14343;
+  --border: #3a3a3a;
+  --radius: 2px;
+  --font-ui: "Segoe UI", Arial, sans-serif;
+  --speed: 600ms;
+}
+
+html[data-style="minimal"][data-mode="light"] {
+  --bg: #f5f5f5;
+  --bg-elev: #ffffff;
+  --bg-sunk: #ececec;
+  --fg: #1a1a1a;
+  --fg-dim: #6a6a6a;
+  --accent: #2563eb;
+  --accent-2: #c0392b;
+  --border: #d4d4d4;
+  --radius: 2px;
+  --font-ui: "Segoe UI", Arial, sans-serif;
+  --speed: 600ms;
+}
+
+/* Strip all flourish */
+html[data-style="minimal"] * {
+  text-shadow: none !important;
+  letter-spacing: normal !important;
+}
+html[data-style="minimal"] .stream-card,
+html[data-style="minimal"] .subbox,
+html[data-style="minimal"] .inv-card,
+html[data-style="minimal"] .settings-group,
+html[data-style="minimal"] .stream-row,
+html[data-style="minimal"] .banner,
+html[data-style="minimal"] .status-chip,
+html[data-style="minimal"] .btn-primary,
+html[data-style="minimal"] .btn-ghost {
+  box-shadow: none !important;
+  background-image: none !important;
+}
+
+html[data-style="minimal"] .brand-name {
+  text-transform: none;
+  font-weight: 600;
+}
+html[data-style="minimal"] .brand-mark { display: none; }
+
+html[data-style="minimal"] .tab-btn { text-transform: none; }
+
+html[data-style="minimal"] .section-head h2,
+html[data-style="minimal"] .subbox-head h2 {
+  text-transform: none;
+  font-weight: 600;
+}
+
+html[data-style="minimal"] .btn-primary {
+  text-transform: none;
+  font-weight: 500;
+  color: #fff;
+}
+
+html[data-style="minimal"] .gi-rank {
+  background: var(--fg-dim);
+  color: #fff;
+  border-radius: 2px;
+}
+
+html[data-style="minimal"] .sr-bar > span,
+html[data-style="minimal"] .inv-bar > span {
+  background: var(--accent);
+}

@@ -1,0 +1,14 @@
+{
+  "name": "kickdropfarmer",
+  "version": "0.1.24",
+  "private": true,
+  "description": "Lightweight Kick.com drops farmer with automatic campaign discovery",
+  "scripts": {
+    "dev": "tauri dev",
+    "build": "tauri build",
+    "tauri": "tauri"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^2"
+  }
+}
