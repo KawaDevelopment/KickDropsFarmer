@@ -2,7 +2,7 @@
 
 A lightweight, low-resource **Kick.com drops farmer**. Pick a game, and it finds
 live drop-enabled streams, registers watch time, tracks real progress, and
-auto-claims your drops — all without ever downloading video.
+auto-claims your drops.
 
 ## Download
 
