@@ -7,7 +7,6 @@ auto-claims your drops.
 ## Download
 
 **[⬇ Get the latest installer from the Releases page](../../releases)** — download
-`KickDropFarmer_<version>_x64-setup.exe`, run it, and install.
 
 > The installer is unsigned, so Windows SmartScreen may warn you. Click
 > **More info → Run anyway**.
