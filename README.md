@@ -22,9 +22,6 @@ auto-claims your drops.
 3. **Pick a game** in the **Games** tab (e.g. Rust). The **Home** tab shows it
    farming, with live progress.
 
-Don't have an account? Turn on **Settings → Demo Mode** to explore the whole
-UI with simulated data.
-
 ## Features
 
 - **Automatic stream discovery** — choose a game; the app finds the live,
