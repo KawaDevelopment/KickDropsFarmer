@@ -1,0 +1,31 @@
+[package]
+name = "kickdropfarmer"
+version = "0.1.28"
+description = "Lightweight Kick.com drops farmer with automatic campaign discovery"
+edition = "2021"
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = ["tray-icon", "image-png"] }
+tauri-plugin-autostart = "2"
+tauri-plugin-notification = "2"
+tauri-plugin-single-instance = "2"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+tokio = { version = "1", features = ["time", "sync", "macros"] }
+wreq = { version = "=6.0.0-rc.31", features = ["ws"] }
+wreq-util = "=3.0.0-rc.14"
+futures-util = "0.3"
+rand = "0.8"
+chrono = "0.4"
+
+[lib]
+name = "kickdropfarmer_lib"
+
+[profile.release]
+opt-level = "s"
+lto = true
+codegen-units = 1
+strip = true

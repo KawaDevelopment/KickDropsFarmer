@@ -1,0 +1,24 @@
+# ---- Build output & caches (regenerated; never commit) ----
+/src-tauri/target/
+/src-tauri/gen/
+node_modules/
+
+# ---- Built installers / binaries (publish via GitHub Releases, not git) ----
+*.exe
+*-setup.exe
+
+# ---- OS / editor cruft ----
+.DS_Store
+Thumbs.db
+desktop.ini
+*.swp
+*~
+
+# ---- IDEs ----
+.vscode/
+.idea/
+
+# ---- Local dev tooling & internal notes (not for distribution) ----
+.claude/
+/tools/
+HANDOFF.md
