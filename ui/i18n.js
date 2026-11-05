@@ -1,25 +1,6 @@
 const FALLBACK = "en";
-
-export function t(lang, key) {
-  const locales = window.KDF_LOCALES || {};
-  const table = locales[lang] || locales[FALLBACK] || {};
-  if (table[key] != null) return table[key];
-  const fb = locales[FALLBACK] || {};
-  return fb[key] != null ? fb[key] : key;
-}
-
-export function applyTranslations(lang) {
-  document.documentElement.lang = lang;
-  document.querySelectorAll("[data-i18n]").forEach((el) => {
-    el.textContent = t(lang, el.getAttribute("data-i18n"));
-  });
-  document.querySelectorAll("[data-i18n-placeholder]").forEach((el) => {
-    el.setAttribute("placeholder", t(lang, el.getAttribute("data-i18n-placeholder")));
-  });
-  document.querySelectorAll("[data-i18n-title]").forEach((el) => {
-    el.setAttribute("title", t(lang, el.getAttribute("data-i18n-title")));
-  });
-}
+const tables = {};
+let current = FALLBACK;
 
 export const LANGUAGES = [
   { code: "en", label: "English" },
@@ -29,3 +10,37 @@ export const LANGUAGES = [
   { code: "zh", label: "中文" },
   { code: "ko", label: "한국어" },
 ];
+
+async function loadTable(code) {
+  if (tables[code]) return;
+  try {
+    tables[code] = (await import(`./locales/${code}.js`)).default;
+  } catch (_) {
+    tables[code] = {};
+  }
+}
+
+export async function loadLanguage(code) {
+  const wanted = LANGUAGES.some((l) => l.code === code) ? code : FALLBACK;
+  await Promise.all([loadTable(FALLBACK), loadTable(wanted)]);
+  current = wanted;
+}
+
+export function t(key, vars) {
+  let s = tables[current]?.[key] ?? tables[FALLBACK]?.[key] ?? key;
+  if (vars) s = s.replace(/\{(\w+)\}/g, (m, k) => (vars[k] != null ? String(vars[k]) : m));
+  return s;
+}
+
+export function applyTranslations() {
+  document.documentElement.lang = current;
+  document.querySelectorAll("[data-i18n]").forEach((el) => {
+    el.textContent = t(el.dataset.i18n);
+  });
+  document.querySelectorAll("[data-i18n-placeholder]").forEach((el) => {
+    el.setAttribute("placeholder", t(el.dataset.i18nPlaceholder));
+  });
+  document.querySelectorAll("[data-i18n-title]").forEach((el) => {
+    el.setAttribute("title", t(el.dataset.i18nTitle));
+  });
+}

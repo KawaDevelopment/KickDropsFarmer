@@ -4,279 +4,342 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>KickDropFarmer</title>
+    <script src="boot.js"></script>
     <link rel="stylesheet" href="styles/base.css" />
     <link rel="stylesheet" href="styles/retro.css" />
     <link rel="stylesheet" href="styles/minimal.css" />
-    <!-- Locales loaded as plain globals before the app module. -->
-    <script src="locales/en.js"></script>
-    <script src="locales/ja.js"></script>
-    <script src="locales/es.js"></script>
-    <script src="locales/fr.js"></script>
-    <script src="locales/zh.js"></script>
-    <script src="locales/ko.js"></script>
+    <script type="module" src="app.js"></script>
   </head>
   <body>
-    <!-- Theme transition wipe overlay (light<->dark animation) -->
     <div id="theme-wipe" aria-hidden="true"></div>
-
-    <!-- CRT scanline + vignette overlay (Retro-UI only) -->
     <div id="crt-overlay" aria-hidden="true"></div>
 
-    <!-- Generic confirmation modal -->
+    <!-- ============ MODAL ============ -->
     <div id="modal-overlay" class="modal-overlay hidden" aria-hidden="true">
       <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
         <h3 id="modal-title" class="modal-title"></h3>
         <p id="modal-body" class="modal-body"></p>
         <div class="modal-actions">
-          <button id="modal-cancel" class="btn-ghost"></button>
-          <button id="modal-ok" class="btn-primary"></button>
+          <button id="modal-cancel" class="btn-ghost" type="button"></button>
+          <button id="modal-ok" class="btn-primary" type="button"></button>
         </div>
       </div>
     </div>
 
     <div id="app">
-      <!-- Top bar -->
+      <!-- ============ TOP BAR ============ -->
       <header id="topbar">
         <div class="brand">
-          <span class="brand-mark">▟▙</span>
+          <img class="brand-logo" src="logo.png" alt="" width="26" height="26" />
           <h1 class="brand-name" data-i18n="app_title">KICK DROP FARMER</h1>
         </div>
         <div class="topbar-status">
-          <span id="demo-badge" class="demo-badge hidden">DEMO</span>
+          <span id="demo-badge" class="demo-badge hidden" data-i18n="demo_badge">DEMO</span>
+          <button id="account-chip" class="account-chip" type="button" data-state="off">
+            <span class="account-dot"></span>
+            <span id="account-label"></span>
+          </button>
           <span id="engine-status" class="status-chip" data-state="idle">
             <span class="status-dot"></span>
-            <span id="engine-status-label" data-i18n="status_idle">IDLE</span>
+            <span id="engine-status-label"></span>
           </span>
-          <button id="pause-toggle" class="btn-ghost" data-i18n="btn_pause">Pause</button>
+          <button id="pause-toggle" class="btn-ghost" type="button"></button>
         </div>
       </header>
 
-      <!-- Tab navigation -->
-      <nav id="tabnav">
-        <button class="tab-btn active" data-tab="home" data-i18n="tab_home">Home</button>
-        <button class="tab-btn" data-tab="games" data-i18n="tab_games">Games</button>
-        <button class="tab-btn" data-tab="inventory" data-i18n="tab_inventory">Inventory</button>
-        <button class="tab-btn" data-tab="settings" data-i18n="tab_settings">Settings</button>
+      <!-- ============ TABS ============ -->
+      <nav id="tabnav" role="tablist">
+        <button class="tab-btn active" data-tab="home" role="tab" type="button"><span data-i18n="tab_home">Home</span></button>
+        <button class="tab-btn" data-tab="games" role="tab" type="button"><span data-i18n="tab_games">Games</span></button>
+        <button class="tab-btn" data-tab="inventory" role="tab" type="button">
+          <span data-i18n="tab_inventory">Inventory</span>
+          <span id="claimable-count" class="tab-count hidden"></span>
+        </button>
+        <button class="tab-btn" data-tab="settings" role="tab" type="button"><span data-i18n="tab_settings">Settings</span></button>
       </nav>
 
-      <!-- Scrollable content region -->
       <main id="content">
         <!-- ============ HOME ============ -->
         <section class="tab-panel active" data-panel="home">
-          <div id="login-banner" class="banner hidden">
-            <span id="login-banner-text" data-i18n="home_not_logged_in"></span>
-            <button id="connect-btn" class="btn-primary" data-i18n="btn_connect">Connect Kick Account</button>
+          <div id="setup-card" class="card setup-card hidden">
+            <h2 data-i18n="setup_title">Get started</h2>
+            <ol class="setup-steps">
+              <li id="setup-step-connect" class="setup-step">
+                <span class="step-num">1</span>
+                <div class="step-body">
+                  <strong data-i18n="setup_connect_title">Connect your Kick account</strong>
+                  <span class="muted small" data-i18n="setup_connect_body"></span>
+                </div>
+                <button id="setup-connect" class="btn-primary" type="button" data-i18n="setup_connect_btn">Connect</button>
+              </li>
+              <li id="setup-step-games" class="setup-step">
+                <span class="step-num">2</span>
+                <div class="step-body">
+                  <strong data-i18n="setup_games_title">Choose games to farm</strong>
+                  <span class="muted small" data-i18n="setup_games_body"></span>
+                </div>
+                <button id="setup-games" class="btn-primary" type="button" data-i18n="setup_games_btn">Choose games</button>
+              </li>
+            </ol>
+            <button id="setup-demo" class="btn-link small" type="button" data-i18n="setup_demo"></button>
           </div>
 
-          <div id="home-empty" class="empty-state hidden" data-i18n="home_no_games"></div>
+          <div id="now-card" class="card now-card hidden">
+            <div class="now-head">
+              <div class="now-title">
+                <span class="eyebrow" data-i18n="home_now_farming">Now farming</span>
+                <h2 id="now-drop" class="now-drop"></h2>
+                <div class="now-sub">
+                  <span id="now-game"></span>
+                  <span class="sep">|</span>
+                  <button id="now-channel" class="btn-link" type="button" data-i18n-title="open_stream"></button>
+                </div>
+              </div>
+              <img id="now-image" class="now-image hidden" alt="" />
+            </div>
+            <div class="progress big"><span id="now-bar"></span></div>
+            <div class="now-meta">
+              <span id="now-progress"></span>
+              <span id="now-eta"></span>
+            </div>
+            <div class="now-foot">
+              <span id="now-status" class="pill"></span>
+              <span id="now-viewers" class="muted small"></span>
+            </div>
+            <canvas id="now-graph" class="now-graph"></canvas>
+          </div>
+
+          <div id="idle-card" class="card idle-card hidden">
+            <h2 id="idle-title"></h2>
+            <p id="idle-body" class="muted"></p>
+            <button id="idle-action" class="btn-primary hidden" type="button"></button>
+          </div>
+
+          <div class="stats">
+            <div class="stat">
+              <span id="stat-unclaimed" class="stat-value">0</span>
+              <span class="stat-label" data-i18n="stat_unclaimed">Drops left</span>
+            </div>
+            <div class="stat">
+              <span id="stat-claimed" class="stat-value">0</span>
+              <span class="stat-label" data-i18n="stat_claimed">Claimed this session</span>
+            </div>
+            <div class="stat">
+              <span id="stat-watch" class="stat-value">0m</span>
+              <span class="stat-label" data-i18n="stat_watch">Watched this session</span>
+            </div>
+          </div>
+
+          <div id="queue-section">
+            <div class="section-head"><h2 data-i18n="home_up_next">Up next</h2></div>
+            <div id="queue" class="queue"></div>
+          </div>
 
           <div class="section-head">
-            <h2 data-i18n="home_active_streams">Active Streams</h2>
-            <span id="home-update" class="muted"></span>
+            <h2 data-i18n="home_engine_log">Activity log</h2>
+            <div class="head-actions">
+              <span id="home-update" class="muted small"></span>
+              <button id="log-copy" class="btn-ghost small" type="button" data-i18n="btn_copy">Copy</button>
+            </div>
           </div>
-          <div id="stream-grid"></div>
-
-          <div class="section-head">
-            <h2 data-i18n="home_engine_log">Engine Log</h2>
-          </div>
-          <pre id="engine-log" class="engine-log"></pre>
+          <pre id="engine-log" class="engine-log" tabindex="0"></pre>
         </section>
 
         <!-- ============ GAMES ============ -->
         <section class="tab-panel" data-panel="games">
+          <p class="muted small panel-hint" data-i18n="games_hint"></p>
           <div class="games-split">
             <div class="subbox">
               <div class="subbox-head">
-                <h2 data-i18n="games_available">Games with Active Drops</h2>
+                <h2 data-i18n="games_available">Available</h2>
+                <input id="games-search" class="search" type="search" autocomplete="off" spellcheck="false" data-i18n-placeholder="games_search" />
               </div>
-              <div id="games-available" class="game-list">
-                <div class="muted pad" data-i18n="games_empty_available"></div>
-              </div>
+              <div id="games-available" class="game-list"></div>
             </div>
-
             <div class="subbox">
               <div class="subbox-head">
-                <h2 data-i18n="games_selected">Selected — drag to set priority</h2>
+                <h2 data-i18n="games_selected">Farming order</h2>
                 <span class="muted small" data-i18n="games_priority_hint"></span>
               </div>
-              <div id="games-selected" class="game-list droptarget">
-                <div class="muted pad" data-i18n="games_empty_selected"></div>
-              </div>
+              <div id="games-selected" class="game-list"></div>
             </div>
           </div>
         </section>
 
         <!-- ============ INVENTORY ============ -->
         <section class="tab-panel" data-panel="inventory">
-          <div class="section-head"><h2 data-i18n="inv_title">Drop Inventory</h2></div>
-          <h3 class="group-label" data-i18n="inv_in_progress">In Progress</h3>
-          <div id="inv-progress" class="inv-grid"></div>
-          <h3 class="group-label" data-i18n="inv_claimed">Claimed</h3>
-          <div id="inv-claimed" class="inv-grid"></div>
-          <div id="inv-empty" class="empty-state hidden" data-i18n="inv_empty"></div>
+          <div class="section-head">
+            <h2 data-i18n="inv_title">Drop inventory</h2>
+            <div class="segmented" role="group">
+              <button class="seg-btn active" type="button" data-scope="selected" data-i18n="inv_scope_selected">Selected games</button>
+              <button class="seg-btn" type="button" data-scope="all" data-i18n="inv_scope_all">All games</button>
+            </div>
+          </div>
+          <div id="inv-list"></div>
+          <div id="inv-empty" class="empty-state hidden"></div>
         </section>
 
         <!-- ============ SETTINGS ============ -->
         <section class="tab-panel" data-panel="settings">
-          <!-- Kick Connection -->
-          <fieldset class="settings-group">
+          <fieldset id="kick-section" class="settings-group">
             <legend data-i18n="set_kick">Kick Connection</legend>
             <div class="setting-row wide">
-              <span class="muted small" data-i18n="set_kick_help">Paste your Kick cookie header to connect. In your browser: log into kick.com, press F12 → Network → click any request to kick.com → under Request Headers copy the WHOLE "cookie:" value, and paste it below. (Pasting only the session_token still connects but can't read drop progress or credit watch time — the full cookie header is required for those.)</span>
-              <div class="input-with-btn" style="margin-top:8px">
-                <input id="set-kick-token" type="password" autocomplete="off" spellcheck="false" placeholder="cookie header (or session_token value)" />
-                <button id="kick-token-save" class="btn-primary" data-i18n="btn_connect_token">Connect</button>
-                <button id="kick-token-clear" class="btn-ghost" data-i18n="btn_clear">Clear</button>
+              <div id="kick-conn-state" class="conn-state" data-state="off"></div>
+              <ol class="howto small">
+                <li data-i18n="set_kick_step1"></li>
+                <li data-i18n="set_kick_step2"></li>
+                <li data-i18n="set_kick_step3"></li>
+                <li data-i18n="set_kick_step4"></li>
+              </ol>
+              <div class="input-with-btn">
+                <input id="set-kick-token" type="password" autocomplete="off" spellcheck="false" data-i18n-placeholder="set_kick_placeholder" />
+                <button id="kick-token-reveal" class="btn-ghost" type="button" data-i18n="btn_show">Show</button>
               </div>
-              <span id="kick-conn-status" class="small" style="margin-top:6px;display:block"></span>
+              <div class="button-row">
+                <button id="kick-token-save" class="btn-primary" type="button" data-i18n="btn_connect_token">Connect</button>
+                <button id="kick-open" class="btn-ghost" type="button" data-i18n="btn_open_kick">Open kick.com</button>
+                <button id="kick-token-clear" class="btn-ghost danger" type="button" data-i18n="btn_disconnect">Disconnect</button>
+              </div>
+              <span id="kick-conn-status" class="small conn-msg"></span>
             </div>
           </fieldset>
 
-          <!-- General -->
           <fieldset class="settings-group">
             <legend data-i18n="set_general">General</legend>
-
             <div class="setting-row">
-              <label data-i18n="set_language">Language</label>
+              <label for="set-language" data-i18n="set_language">Language</label>
               <select id="set-language"></select>
             </div>
-
             <div class="setting-row">
-              <label data-i18n="set_ui_style">UI Style</label>
+              <label for="set-ui-style" data-i18n="set_ui_style">UI Style</label>
               <select id="set-ui-style">
-                <option value="retro" data-i18n="set_ui_retro">Retro</option>
                 <option value="minimal" data-i18n="set_ui_minimal">Minimalist</option>
+                <option value="retro" data-i18n="set_ui_retro">Retro</option>
               </select>
             </div>
-
             <div class="setting-row">
-              <label data-i18n="set_theme">Light / Dark Mode</label>
+              <span class="label" data-i18n="set_theme">Light / Dark Mode</span>
               <div class="switch" id="switch-mode" role="switch" tabindex="0">
                 <span class="switch-track"><span class="switch-thumb"></span></span>
-                <span class="switch-label" id="mode-label" data-i18n="dark">Dark</span>
+                <span class="switch-label" id="mode-label"></span>
               </div>
             </div>
-
             <div class="setting-row">
-              <label data-i18n="set_startup">Start on Boot</label>
+              <span class="label" data-i18n="set_startup">Start on Boot</span>
               <div class="switch" id="switch-autostart" role="switch" tabindex="0">
                 <span class="switch-track"><span class="switch-thumb"></span></span>
               </div>
             </div>
-
+            <div class="setting-row sub">
+              <span class="label" data-i18n="set_start_minimized">Start minimized to the tray</span>
+              <div class="switch" id="switch-minimized" role="switch" tabindex="0">
+                <span class="switch-track"><span class="switch-thumb"></span></span>
+              </div>
+            </div>
             <div class="setting-row">
-              <label data-i18n="set_close_tray">Close to System Tray</label>
+              <span class="label">
+                <span data-i18n="set_close_tray">Close to System Tray</span>
+                <span class="muted small block" data-i18n="set_close_tray_hint"></span>
+              </span>
               <div class="switch" id="switch-tray" role="switch" tabindex="0">
                 <span class="switch-track"><span class="switch-thumb"></span></span>
               </div>
             </div>
           </fieldset>
 
-          <!-- Farming -->
           <fieldset class="settings-group">
             <legend data-i18n="set_farming">Farming</legend>
-
             <div class="setting-row">
-              <label data-i18n="set_auto_claim">Auto-claim Completed Drops</label>
+              <span class="label" data-i18n="set_auto_claim">Auto-claim Completed Drops</span>
               <div class="switch" id="switch-autoclaim" role="switch" tabindex="0">
                 <span class="switch-track"><span class="switch-thumb"></span></span>
               </div>
             </div>
-
             <div class="setting-row">
-              <label data-i18n="set_demo">Demo Mode (no Kick account needed)</label>
+              <span class="label" data-i18n="set_demo">Demo Mode</span>
               <div class="switch" id="switch-demo" role="switch" tabindex="0">
                 <span class="switch-track"><span class="switch-thumb"></span></span>
               </div>
             </div>
           </fieldset>
 
-          <!-- Scheduler -->
           <fieldset class="settings-group">
             <legend data-i18n="set_scheduler">Scheduler</legend>
             <div class="setting-row">
-              <label data-i18n="set_sched_enable">Only Farm Between Set Hours</label>
+              <span class="label" data-i18n="set_sched_enable">Only Farm Between Set Hours</span>
               <div class="switch" id="switch-sched" role="switch" tabindex="0">
                 <span class="switch-track"><span class="switch-thumb"></span></span>
               </div>
             </div>
-            <div class="setting-row">
-              <label data-i18n="set_sched_start">Start</label>
+            <div class="setting-row sub">
+              <label for="set-sched-start" data-i18n="set_sched_start">Start</label>
               <input type="time" id="set-sched-start" />
             </div>
-            <div class="setting-row">
-              <label data-i18n="set_sched_end">End</label>
+            <div class="setting-row sub">
+              <label for="set-sched-end" data-i18n="set_sched_end">End</label>
               <input type="time" id="set-sched-end" />
             </div>
           </fieldset>
 
-          <!-- Notifications -->
           <fieldset class="settings-group">
             <legend data-i18n="set_notifications">Notifications</legend>
             <div class="setting-row">
-              <label data-i18n="set_notif_enable">Enable Desktop Notifications</label>
+              <span class="label" data-i18n="set_notif_enable">Enable Desktop Notifications</span>
               <div class="switch" id="switch-notif" role="switch" tabindex="0">
                 <span class="switch-track"><span class="switch-thumb"></span></span>
               </div>
             </div>
-            <div class="setting-row">
-              <label data-i18n="set_notif_claim">Notify on Drop Claimed</label>
+            <div class="setting-row sub">
+              <span class="label" data-i18n="set_notif_claim">Notify on Drop Claimed</span>
               <div class="switch" id="switch-notif-claim" role="switch" tabindex="0">
                 <span class="switch-track"><span class="switch-thumb"></span></span>
               </div>
             </div>
-            <div class="setting-row">
-              <label data-i18n="set_notif_expiry">Notify on Session Expiry</label>
+            <div class="setting-row sub">
+              <span class="label" data-i18n="set_notif_expiry">Notify on Session Expiry</span>
               <div class="switch" id="switch-notif-expiry" role="switch" tabindex="0">
                 <span class="switch-track"><span class="switch-thumb"></span></span>
               </div>
             </div>
           </fieldset>
 
-          <!-- Discord -->
           <fieldset class="settings-group">
             <legend data-i18n="set_discord">Discord Webhook</legend>
             <div class="setting-row">
-              <label data-i18n="set_discord_enable">Send Notifications to Discord</label>
+              <span class="label" data-i18n="set_discord_enable">Send Notifications to Discord</span>
               <div class="switch" id="switch-discord" role="switch" tabindex="0">
                 <span class="switch-track"><span class="switch-thumb"></span></span>
               </div>
             </div>
             <div class="setting-row wide">
-              <label data-i18n="set_discord_url">Webhook URL</label>
+              <label for="set-discord-url" data-i18n="set_discord_url">Webhook URL</label>
               <div class="input-with-btn">
-                <input type="text" id="set-discord-url" data-i18n-placeholder="set_discord_placeholder" />
-                <button id="discord-test" class="btn-ghost" data-i18n="btn_test">Test</button>
+                <input type="text" id="set-discord-url" autocomplete="off" spellcheck="false" data-i18n-placeholder="set_discord_placeholder" />
+                <button id="discord-test" class="btn-ghost" type="button" data-i18n="btn_test">Test</button>
               </div>
             </div>
           </fieldset>
 
-          <!-- Diagnostics / calibration -->
           <fieldset class="settings-group">
             <legend data-i18n="set_diagnostics">Diagnostics</legend>
             <div class="setting-row wide">
-              <span class="muted small" data-i18n="set_diag_desc">Log in first, then probe Kick's live endpoints to confirm the API shapes the farmer relies on.</span>
-              <div class="input-with-btn" style="margin-top:8px">
-                <button id="diag-run" class="btn-primary" data-i18n="btn_run_diag">Run Diagnostics</button>
-                <button id="diag-copy" class="btn-ghost" data-i18n="btn_copy">Copy</button>
+              <span class="muted small" data-i18n="set_diag_desc"></span>
+              <div class="button-row">
+                <button id="diag-run" class="btn-primary" type="button" data-i18n="btn_run_diag">Run Diagnostics</button>
+                <button id="diag-copy" class="btn-ghost" type="button" data-i18n="btn_copy">Copy</button>
               </div>
             </div>
             <div id="diag-output" class="diag-output hidden"></div>
           </fieldset>
 
           <div class="reload-bar">
-            <span class="muted small">
-              <span data-i18n="set_reload_hint"></span>
-              <span id="app-version" class="version-tag"></span>
-            </span>
-            <button id="reload-btn" class="btn-primary big" data-i18n="btn_reload">Reload Application</button>
+            <span class="muted small">KickDropFarmer <span id="app-version" class="version-tag"></span></span>
+            <button id="reload-btn" class="btn-ghost" type="button" data-i18n="btn_reload">Reload interface</button>
           </div>
         </section>
       </main>
     </div>
 
-    <div id="toast" class="toast hidden"></div>
-
-    <script type="module" src="app.js"></script>
+    <div id="toast" class="toast hidden" role="status" aria-live="polite"></div>
   </body>
 </html>
